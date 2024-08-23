@@ -1,0 +1,5 @@
+{
+  "title": "Exemplo utilizando o Zod",
+  "description": "Como aplicar i18n para formulários utilzando a validação geradas pelos schemas do Zod.",
+  "exampleTitle": "Formulário de usuário"
+}

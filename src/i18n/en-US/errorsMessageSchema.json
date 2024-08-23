@@ -1,0 +1,13 @@
+{
+  "post_title_required_error": "How do you expect people to read if you don't even put a title??",
+  "post_title_min": "Empty title doesn't count, buddy",
+  "post_description_required_error": "Without a description, it's hard for others to understand you",
+  "post_description_min": "Make an effort to write a little description, please help us out",
+  "post_body_required_error": "What?? I thought you were here to share all your knowledge, write something",
+  "post_body_min": "You need to write more than that, stop being lazy...",
+  "login_username_required_error": "This field is required, buddy",
+  "login_username_min": "This field can't be empty, buddy",
+  "login_password_required_error": "I need it to test here on the machine",
+  "login_password_min": "It's missing some numbers, friend",
+  "login_password_max": "Whoa buddy, this isn't German, why so many letters"
+}
