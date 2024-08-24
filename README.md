@@ -11,6 +11,7 @@ An use case of how to apply i18n in a typescript project.
 - Language : `TypeScript` (^5.5.4)
 - Web Application framework : `Vite` (^5.4.2)
 - Router : `@tanstack/react-router` (^1.49.7)
+- Markdown Viewer : `@uiw/react-markdown-preview` (^5.1.2)
 - Form : `react-hook-form` (^7.52.2)
 - Validation : `zod` (^3.23.8)
 - Styling : `tailwindcss` (^3.4.10)
