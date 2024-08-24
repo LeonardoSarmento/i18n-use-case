@@ -2,5 +2,49 @@
   "title": "Olá, eu sou Leonardo Sarmento!",
   "description1": "Uma configuração inicial da aplicação da biblioteca/sistema de internacionalização da aplicação, i18n.",
   "description2": "Exemplos de utilização com formatação e integração com a biblioteca de validação Zod.",
-  "footer": "Espero que você tenha um ótimo desenvolvimento!"
+  "footer": "Espero que você tenha um ótimo desenvolvimento!",
+  "stack": {
+    "main": {
+      "title": "i18n TechStack",
+      "description": "Dependencies utilized to config the internacionalization system",
+      "tech": [
+        { "title": "I18n", "description": "i18next", "link": "https://www.i18next.com/overview/getting-started" },
+        {
+          "title": "I18n utilizando React",
+          "description": "react-i18next",
+          "link": "https://react.i18next.com/getting-started"
+        },
+        {
+          "title": "Detecção de linguagem",
+          "description": "i18next-browser-languagedetector",
+          "link": "https://www.npmjs.com/package/i18next-browser-languagedetector"
+        }
+      ]
+    },
+    "secondary": {
+      "title": "Tech Stack",
+      "description": "Outras dependencias utlizadas seja para configurar o projeto ou de uso de exemplos de aplicação da tecnologia",
+      "tech": [
+        { "title": "Framework", "description": "Vite.js com Typescript", "link": "https://vitejs.dev/guide/" },
+        {
+          "title": "Roteamento",
+          "description": "Tanstack Router",
+          "link": "https://tanstack.com/router/latest/docs/framework/react/quick-start"
+        },
+        {
+          "title": "Formulário",
+          "description": "React Hook Form",
+          "link": "https://www.react-hook-form.com/get-started/"
+        },
+        { "title": "Validação", "description": "Zod", "link": "https://zod.dev/?id=basic-usage" },
+        { "title": "Componentes", "description": "Shadcn/ui", "link": "https://ui.shadcn.com/docs/installation" },
+        { "title": "Toast", "description": "Sonner", "link": "https://sonner.emilkowal.ski/" },
+        {
+          "title": "DevTools",
+          "description": "Tanstack Router e Query",
+          "link": "https://tanstack.com/query/latest/docs/framework/react/devtools"
+        }
+      ]
+    }
+  }
 }

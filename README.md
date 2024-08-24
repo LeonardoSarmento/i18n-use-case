@@ -4,14 +4,18 @@ An use case of how to apply i18n in a typescript project.
 
 ### Techs
 
-- Language : `TypeScript` (^5.5.4)
-- Web Application framework : `Vite` (^5.3.4)
-- Router : `@tanstack/react-router` (^1.45.6)
-- Form : `react-hook-form` (^7.52.1)
-- Validation : `zod` (^3.23.8)
-- Styling : `tailwindcss` (^3.4.6)
+- I18n: `i18n` (^23.14.0)
+- React i18n: `react-i18next` (^15.0.1)
+- Language Detection: `i18next-browser-languagedetector` (^8.0.0)
 
-- Lint : `eslint` (^8.57.0)
+- Language : `TypeScript` (^5.5.4)
+- Web Application framework : `Vite` (^5.4.2)
+- Router : `@tanstack/react-router` (^1.49.7)
+- Form : `react-hook-form` (^7.52.2)
+- Validation : `zod` (^3.23.8)
+- Styling : `tailwindcss` (^3.4.10)
+
+- Lint : `eslint` (^8.55.0)
 - Formatting : `prettier` (^3.3.3)
 
 # React + TypeScript + Vite
