@@ -6,6 +6,7 @@ import React, { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import { NavigationBar } from '@components/NavBar';
 import { Footer } from '@components/Footer';
+import { NotFoundComponent } from '@components/NotFoundComponent';
 
 const TanStackRouterDevtools =
   process.env.NODE_ENV === 'production'
@@ -24,6 +25,7 @@ export const Route = createRootRouteWithContext<{
   auth: AuthContext;
 }>()({
   component: RootComponent,
+  notFoundComponent: NotFoundComponent,
 });
 
 function RootComponent() {
