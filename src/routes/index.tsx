@@ -8,17 +8,46 @@ export const Route = createFileRoute('/')({
   component: IndexComponent,
 });
 
-function ListComponent({
-  title,
-  description,
-  link,
-  className,
-}: {
+function IndexComponent() {
+  const { t } = useTranslation('home');
+  return (
+    <div className="my-10 flex items-center justify-center">
+      <Card className="space-y-3">
+        <CardHeader className="border-b text-center">
+          <CardTitle className="border-b text-lg">{t('title')}</CardTitle>
+          <CardDescription>{t('description1')}</CardDescription>
+          <CardDescription>{t('description2')}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Card className="bg-muted p-2">
+            <CardTitle className="text-center">{t('stack.main.title')}</CardTitle>
+            <p className="text-center text-sm text-muted-foreground">{t('stack.main.description')}</p>
+          </Card>
+          <MapListComponent content={t('stack.main.tech', { returnObjects: true })} />
+          <div className="h-1 w-full bg-muted" />
+          <Card className="bg-muted p-2">
+            <CardTitle className="text-center">{t('stack.secondary.title')}</CardTitle>
+            <p className="text-center text-sm text-muted-foreground">{t('stack.secondary.description')}</p>
+          </Card>
+          <MapListComponent content={t('stack.secondary.tech', { returnObjects: true })} />
+          <div className="h-1 w-full bg-muted" />
+        </CardContent>
+        <CardFooter className="justify-center">
+          <CardDescription>{t('footer')}</CardDescription>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
+
+type TListComponent = {
   title: string;
   description: string;
   link?: string;
   className?: string;
-}) {
+};
+
+function ListComponent({ title, description, link, className }: TListComponent) {
   return (
     <Link
       to={link}
@@ -35,38 +64,8 @@ function ListComponent({
   );
 }
 
-function IndexComponent() {
-  const { t } = useTranslation('home');
-  return (
-    <div className="my-10 flex items-center justify-center">
-      <Card className="space-y-3">
-        <CardHeader className="border-b text-center">
-          <CardTitle className="border-b text-lg">{t('title')}</CardTitle>
-          <CardDescription>{t('description1')}</CardDescription>
-          <CardDescription>{t('description2')}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Card className="bg-muted p-2">
-            <CardTitle className="text-center">{t('stack.main.title')}</CardTitle>
-            <p className="text-center text-sm text-muted-foreground">{t('stack.main.description')}</p>
-          </Card>
-          {t('stack.main.tech', { returnObjects: true }).map((tech) => (
-            <ListComponent title={tech.title} description={tech.description} link={tech.link} />
-          ))}
-          <div className="h-1 w-full bg-muted" />
-          <Card className="bg-muted p-2">
-            <CardTitle className="text-center">{t('stack.secondary.title')}</CardTitle>
-            <p className="text-center text-sm text-muted-foreground">{t('stack.secondary.description')}</p>
-          </Card>
-          {t('stack.secondary.tech', { returnObjects: true }).map((tech) => (
-            <ListComponent title={tech.title} description={tech.description} link={tech.link} />
-          ))}
-          <div className="h-1 w-full bg-muted" />
-        </CardContent>
-        <CardFooter className="justify-center">
-          <CardDescription>{t('footer')}</CardDescription>
-        </CardFooter>
-      </Card>
-    </div>
-  );
+function MapListComponent({ content }: { content: TListComponent[] }) {
+  return content.map((tech) => (
+    <ListComponent key={tech.title} title={tech.title} description={tech.description} link={tech.link} />
+  ));
 }
