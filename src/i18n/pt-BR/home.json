@@ -6,7 +6,7 @@
   "stack": {
     "main": {
       "title": "i18n TechStack",
-      "description": "Dependencies utilized to config the internacionalization system",
+      "description": "Dependências utilizadas para configurar o sistema de internacionalização",
       "tech": [
         { "title": "I18n", "description": "i18next", "link": "https://www.i18next.com/overview/getting-started" },
         {
@@ -23,7 +23,7 @@
     },
     "secondary": {
       "title": "Tech Stack",
-      "description": "Outras dependencias utlizadas seja para configurar o projeto ou de uso de exemplos de aplicação da tecnologia",
+      "description": "Outras dependências utlizadas seja para configurar o projeto ou de uso de exemplos de aplicação da tecnologia",
       "tech": [
         { "title": "Framework", "description": "Vite.js com Typescript", "link": "https://vitejs.dev/guide/" },
         {
