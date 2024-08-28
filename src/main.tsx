@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider, createMemoryHistory, createRouter } from '@tanstack/react-router';
+import { RouterProvider, createRouter } from '@tanstack/react-router';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
@@ -9,10 +9,6 @@ import './index.css';
 import { ThemeProvider } from '@services/providers/Theme-provider';
 import { queryClient, QueryProvider } from '@services/providers/QueryProvider';
 import './i18n/config';
-
-const memoryHistory = createMemoryHistory({
-  initialEntries: ['/'], // Pass your initial url
-})
 
 // Create a new router instance
 const router = createRouter({
@@ -25,7 +21,6 @@ const router = createRouter({
   // Since we're using React Query, we don't want loader calls to ever be stale
   // This will ensure that the loader is always called when the route is preloaded or visited
   defaultPreloadStaleTime: 0,
-  history: memoryHistory,
 });
 
 // Register the router instance for type safety
