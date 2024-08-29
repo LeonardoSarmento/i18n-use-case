@@ -4,5 +4,6 @@
   "users": "User",
   "zod": "Zod example",
   "config": "Config",
-  "logout": "Log out"
+  "logout": "Log out",
+  "portfolio": "Portfolio"
 }

@@ -9,7 +9,7 @@ export default function MarkdownComponent({ source, className }: TMarkdownCompon
   return (
     <MarkdownPreview
       source={source}
-      className={cn('rounded-md p-4 px-6', className)}
+      className={cn('rounded-md p-4 xl:px-6', className)}
       wrapperElement={{
         'data-color-mode':
           theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme,

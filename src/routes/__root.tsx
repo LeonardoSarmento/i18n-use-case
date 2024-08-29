@@ -31,7 +31,7 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <>
-      <div className="flex min-h-screen w-screen flex-col justify-between px-6 pb-6 xl:px-20">
+      <div className="flex min-h-screen w-screen flex-col justify-between px-2 pb-6 xl:px-20">
         <NavigationBar />
         <Outlet />
         <Footer />
