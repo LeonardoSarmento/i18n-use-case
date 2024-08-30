@@ -4,11 +4,9 @@ A internacionalização, também chamada de i18n, é um passo importante para au
 
 Abaixo estarei te acompanhando em uma das formas de se configurar o seu projeto em React com Typescript.
 
-Aqui está o artigo completo em Markdown sobre a implementação de i18n em uma aplicação React com TypeScript.
-
 ## Configurando o Ambiente
 
-### Instalação das Dependências Necessárias
+### Instalação das dependências necessárias
 
 Vamos instalar as bibliotecas que nos permitirão adicionar suporte a i18n na nossa aplicação. Neste tutorial, usaremos o `react-i18next`, que é uma biblioteca popular e bem documentada para internacionalização em React.
 
@@ -22,11 +20,11 @@ npm install i18next react-i18next
 
 Existem várias bibliotecas para implementar i18n em uma aplicação React, como `react-intl`, `react-i18next`, e `lingui`. Cada uma possui suas vantagens e desvantagens, dependendo das necessidades do projeto.
 
-### Por Que Escolher o react-i18next?
+### Por que escolher o react-i18next?
 
 Optamos por usar o `react-i18next` devido à sua flexibilidade, suporte robusto a TypeScript, e uma comunidade ativa que mantém a biblioteca constantemente atualizada. Além disso, ela se integra facilmente com o ecossistema React.
 
-## Gerenciamento de preferências do usuário 
+## Gerenciamento de preferências do usuário
 
 Agora que decidimos usar o `react-i18next`, vamos instalar uma dependência adicional mas necessária para uma boa experiência do usário em nosso projeto.
 
@@ -38,11 +36,12 @@ npm install i18next-browser-languagedetector
 
 ## Configuração Básica do i18n
 
-### Configurando o i18next para Suportar Múltiplos Idiomas
+### Configurando o i18next para suportar múltiplos idiomas
 
 Primeiro, precisamos configurar o `i18next` para suportar múltiplos idiomas. Vamos criar um arquivo de configuração chamado `config.ts` na pasta `i18n` localizada na pasta `src`:
 
 `src/i18n/config.ts`
+
 ```typescript
 import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -73,7 +72,7 @@ i18next.loadLanguages(['pt-BR', 'en-US']);
 export default i18next;
 ```
 
-### Adicionando Arquivos de Tradução
+### Adicionando arquivos de tradução
 
 Vamos criar a estrutura de diretórios e arquivos para as traduções. Crie a seguinte estrutura:
 
@@ -162,7 +161,7 @@ declare module 'i18next' {
 }
 ```
 
-### Criando Tipos para as Traduções
+### Criando tipos para as traduções
 
 Este arquivo informa ao TypeScript quais são os idiomas disponíveis e quais são as chaves de tradução para cada um deles. Com isso, ao utilizar o hook `useTranslation`, o TypeScript será capaz de oferecer autocompletar e verificação de tipos para as chaves de tradução.
 
@@ -174,12 +173,29 @@ Com a tipagem configurada, podemos utilizar o `useTranslation` com segurança:
 import { useTranslation } from 'react-i18next';
 
 function MyComponent() {
-  const { t } = useTranslation();
+  const { t } = useTranslation('home');
 
   return (
     <div>
       <h1>{t('welcome')}</h1>
       <p>{t('description')}</p>
+    </div>
+  );
+}
+```
+
+Ou o namespace pode ser definido inline:
+
+```typescript
+import { useTranslation } from 'react-i18next';
+
+function MyComponent() {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <h1>{t('welcome', { ns: 'home' })}</h1>
+      <p>{t('description', { ns: 'home' })}</p>
     </div>
   );
 }
@@ -221,16 +237,52 @@ i18n.init({
 
 ## Configurações Avançadas do i18n
 
-### Configurando Fallback de Idiomas
+### Configurando fallback de idiomas
 
-O fallback de idioma é utilizado quando a tradução para o idioma atual não está disponível. Já configuramos o `fallbackLng` para `en`, mas você pode personalizar isso ainda mais:
+O fallback de idioma é utilizado quando a tradução para o idioma atual não está disponível. Já configuramos o `fallbackLng` para `['en-US', 'pt-BR']`, mas você pode personalizar isso ainda mais:
 
 ```typescript
-i18n.init({
+// fallback to one language
+i18next.init({
+  fallbackLng: 'en',
+});
+
+// fallback ordered
+i18next.init({
+  fallbackLng: ['fr', 'en'],
+});
+
+// fallback depending on user language
+i18next.init({
   fallbackLng: {
-    'pt-BR': ['pt'],
-    es: ['en'],
+    'de-CH': ['fr', 'it'], //French and Italian are also spoken in Switzerland
+    'zh-Hant': ['zh-Hans', 'en'],
+    es: ['fr'],
     default: ['en'],
+  },
+});
+
+// function that returns an array of fallbacks
+// your function may also return a string or object as above
+i18next.init({
+  fallbackLng: (code) => {
+    if (!code || code === 'en') return ['en-US'];
+    const fallbacks = [code];
+
+    // We maintain en-US and en-AU. Some regions will prefer en-AU.
+    if (code.startsWith('en-') && !['en-US', 'en-AU'].includes(code)) {
+      if (['en-GB', 'en-NZ', 'en-IR'].includes(code)) fallbacks.push('en-AU');
+      else fallbacks.push('en-US');
+      return fallbacks;
+    }
+
+    // add pure lang
+    const langPart = code.split('-')[0];
+    if (langPart !== code) fallbacks.push(langPart);
+
+    // finally, developer language
+    fallbacks.push('dev');
+    return fallbacks;
   },
 });
 ```
@@ -243,8 +295,162 @@ O `i18next` também oferece suporte a interpolação e pluralização, permitind
 {
   "key_with_interpolation": "Hello, {{name}}!",
   "key_with_plural": "You have {{count}} item",
-  "key_with_plural_plural": "You have {{count}} items"
+  "key_with_plural_plural": "You have {{count}} items",
+  "key": "I am {{author.name}}",
+  "object": {
+    "title": "Welcome to my blog. I am {{author.name}}",
+    "description": "Your description will be displayed"
+  }
 }
+```
+
+E para aplicar este caso:
+
+```typescript
+import { useTranslation } from 'react-i18next';
+
+function Description(){
+  const { t } = useTranslation('interpolation');
+
+  const author = {
+    name: 'Leonardo',
+    github: 'LeonardoSarmento'
+  };
+
+  return (
+    <>
+      <p>{t('key_with_interpolation', { name: 'Leonardo' })}</p> // -> "Hello, Leonardo!"
+      <p>{t('key', { author })}</p> // -> "I am Leonardo"
+      <p>{t('object.title', { author, returnObjects: true })}</p> // -> "Welcome to my blog. I am Leonardo"
+    </>
+  );
+}
+```
+
+### Suporte para Formatação
+
+Também é possível se beneficiar das funcionalidade nativas de formatação do `i18next`:
+
+## Numbers
+
+```json
+{
+  "intlNumber": "Some {{val, number}}",
+  "intlNumberWithOptions": "Some {{val, number(minimumFractionDigits: 2)}}"
+}
+```
+
+```typescript
+t('intlNumber', { val: 1000 });
+// --> Some 1,000
+t('intlNumber', { val: 1000.1, minimumFractionDigits: 3 });
+// --> Some 1,000.100
+t('intlNumber', { val: 1000.1, formatParams: { val: { minimumFractionDigits: 3 } } });
+// --> Some 1,000.100
+t('intlNumberWithOptions', { val: 2000 });
+// --> Some 2,000.00
+t('intlNumberWithOptions', { val: 2000, minimumFractionDigits: 3 });
+// --> Some 2,000.000
+```
+
+---
+
+## Currency
+
+`src/i18n/en-US/currency.json`
+
+```json
+{
+  "intlCurrencyWithOptionsSimplified": "The value is {{val, currency(USD)}}",
+  "intlCurrencyWithOptions": "The value is {{val, currency(currency: USD)}}",
+  "twoIntlCurrencyWithUniqueFormatOptions": "The value is {{localValue, currency}} or {{altValue, currency}}"
+}
+```
+
+`src/i18n/pt-BR/currency.json`
+
+```json
+{
+  "intlCurrencyWithOptionsSimplified": "O valor é {{val, currency(BRL)}}",
+  "intlCurrencyWithOptions": "O valor é {{val, currency(currency: BRL)}}",
+  "twoIntlCurrencyWithUniqueFormatOptions": "O valor é {{localValue, currency}} or {{altValue, currency}}"
+}
+```
+
+```typescript
+t('intlCurrencyWithOptionsSimplified', { val: 2000 });
+// --> The value is $2,000.00
+t('intlCurrencyWithOptions', { val: 2300 });
+// --> The value is $2,300.00
+t('twoIntlCurrencyWithUniqueFormatOptions', {
+  localValue: 12345.67,
+  altValue: 16543.21,
+  formatParams: {
+    localValue: { currency: 'USD', locale: 'en-US' },
+    altValue: { currency: 'CAD', locale: 'fr-CA' },
+  },
+});
+// --> The value is $12,345.67 or 16 543,21 $ CA
+```
+
+---
+
+## DateTime
+
+```json
+{
+  "intlDateTime": "On the {{val, datetime}}"
+}
+```
+
+```typescript
+t('intlDateTime', { val: new Date(Date.UTC(2012, 11, 20, 3, 0, 0)) });
+// --> On the 12/20/2012
+t('intlDateTime', {
+  val: new Date(Date.UTC(2012, 11, 20, 3, 0, 0)),
+  formatParams: {
+    val: { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' },
+  },
+});
+// --> On the Thursday, December 20, 2012
+```
+
+---
+
+## RelativeTime
+
+```json
+{
+  "intlRelativeTime": "Lorem {{val, relativetime}}",
+  "intlRelativeTimeWithOptions": "Lorem {{val, relativetime(quarter)}}",
+  "intlRelativeTimeWithOptionsExplicit": "Lorem {{val, relativetime(range: quarter; style: narrow;)}}"
+}
+```
+
+```typescript
+t('intlRelativeTime', { val: 3 });
+// --> Lorem in 3 days
+t('intlRelativeTimeWithOptions', { val: -3 });
+// --> Lorem 3 quarters ago
+t('intlRelativeTimeWithOptionsExplicit', { val: -3 });
+// --> Lorem 3 qtrs. ago
+t('intlRelativeTimeWithOptionsExplicit', { val: -3, style: 'long' });
+// --> Lorem 3 quarters ago
+```
+
+---
+
+## List
+
+```json
+{
+  "intlList": "A list of {{val, list}}"
+}
+```
+
+```typescript
+t('intlList', { val: ['locize', 'i18next', 'awesomeness'] });
+// --> A list of locize, i18next, and awesomeness
 ```
 
 ## Gerenciamento de Idiomas na Aplicação
@@ -312,7 +518,7 @@ const Flag = ({ countryCode, className }: FlagProps) => {
 
 ## Testando a Implementação do i18n
 
-### Testando Componentes Traduzidos
+### Testando componentes traduzidos
 
 Para testar componentes que utilizam traduções, você pode criar mocks dos dados de tradução durante os testes:
 
@@ -335,41 +541,41 @@ test('renders translated text', () => {
 
 ```
 
-### Usando Mocks para Simular Diferentes Idiomas
+### Usando mocks para simular diferentes idiomas
 
 Você também pode configurar testes para simular diferentes idiomas, verificando se os textos estão sendo renderizados corretamente em cada um deles.
 
 ## Melhores Práticas
 
-### Estrutura de Arquivos para Traduções
+### Estrutura de arquivos para traduções
 
 Mantenha uma estrutura de arquivos organizada para facilitar a manutenção. Utilize namespaces quando necessário e evite duplicar chaves de tradução.
 
-### Evitando Strings Hard-Coded
+### Evitando strings hard-coded
 
 Nunca insira strings de texto diretamente nos componentes. Sempre use o mecanismo de tradução para garantir que todos os textos possam ser traduzidos.
 
-### Boas Práticas para Tradução de Componentes Complexos
+### Boas práticas para tradução de componentes complexos
 
 Componentes complexos que possuem muitas mensagens devem ser organizados em arquivos de tradução específicos, utilizando namespaces e interpolação para facilitar a manutenção e a leitura do código.
 
 ## Deploy e Considerações Finais
 
-### Como Preparar a Aplicação para Produção
+### Como preparar a aplicação para produção
 
 Certifique-se de que todas as traduções estejam corretas e que a aplicação suporte fallback adequadamente. Minifique os arquivos de tradução para reduzir o tamanho do bundle e melhorar o desempenho.
 
-### Problemas Comuns e Como Evitá-los
+### Problemas comuns e como evitá-los
 
 Verifique se todas as chaves de tradução estão presentes nos arquivos de todos os idiomas suportados para evitar falhas durante a execução da aplicação.
 
-## Resolvendo Problemas Comuns
+## Resolvendo problemas comuns
 
 ### Erros de Configuração e Como Depurá-los
 
 Caso ocorra algum erro de configuração, utilize o modo debug do `i18next` para verificar o que pode estar causando o problema. O modo debug fornece logs detalhados sobre o carregamento de traduções e a detecção de idiomas.
 
-### Dicas para Melhorar o Desempenho do i18n
+### Dicas para melhorar o desempenho do i18n
 
 Utilize a funcionalidade de lazy loading para carregar apenas as traduções necessárias e minimize a quantidade de chaves de tradução carregadas de uma só vez.
 
@@ -390,7 +596,3 @@ Use chaves de tradução específicas para casos onde o texto precisa ser adapta
 **É possível fazer i18n com outros frameworks além do React?**
 
 Sim, bibliotecas como `i18next` possuem suporte para diversos frameworks e até mesmo aplicações JavaScript vanilla.
-
----
-
-Este conteúdo está totalmente em Markdown e abrange todos os aspectos da implementação de i18n em uma aplicação React com TypeScript, seguindo as melhores práticas e abordando desde a configuração inicial até o deploy.
