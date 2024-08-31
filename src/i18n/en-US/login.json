@@ -44,7 +44,7 @@
       "title": "Purchase of {{val, currency(USD)}} successfully approved!"
     },
     "error": {
-      "description": "Increase your credit card limit just to be sure",
+      "description": "Increase your credit card limit just to be sure and try admin admin :)",
       "title": "You lied to me, man :("
     }
   },

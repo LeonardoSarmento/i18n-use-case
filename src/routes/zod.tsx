@@ -3,14 +3,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@comp
 import { UserAuthForm } from '@components/UserAuthForm';
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import ZodContent from '@assets/pages/zod.md';
+import ZodContentPtBR from '@assets/pages/zod.md';
+import ZodContentUS from '@assets/pages/zod-en.md';
+import { postsQueryOptions } from '@services/hooks/postsQueryOptions';
+import i18n from '../i18n/config';
+import { PendingComponent } from '@components/PendingComponent';
 
 export const Route = createFileRoute('/zod')({
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(postsQueryOptions(i18n.language, { en: ZodContentUS, ptBR: ZodContentPtBR })),
   component: ZodExampleComponent,
+  pendingComponent: PendingComponent,
 });
 
 function ZodExampleComponent() {
   const { t } = useTranslation('zod');
+  const content = Route.useLoaderData();
+
   return (
     <div className="flex flex-col gap-4">
       <Card>
@@ -27,7 +36,7 @@ function ZodExampleComponent() {
           <UserAuthForm />
         </CardContent>
       </Card>
-      <MarkdownComponent source={ZodContent} />
+      <MarkdownComponent source={content} />
     </div>
   );
 }

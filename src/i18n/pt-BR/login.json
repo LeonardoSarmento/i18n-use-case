@@ -44,7 +44,7 @@
       "title": "Compra de {{val, currency(BRL)}} aprovada com sucesso!"
     },
     "error": {
-      "description": "Aumenta o limite do seu cartão de crédito ai só pra garantir",
+      "description": "Aumenta o limite do seu cartão de crédito ai só pra garantir e tente admin admin :)",
       "title": "Você mentiu pra mim cara :("
     }
   },

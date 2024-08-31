@@ -1,116 +1,200 @@
-## Multiple SSH keys in the pc
+Para integrar `react-hook-form` com `Zod` para validação e utilizar `i18n` para mensagens de erro traduzidas é uma maneira eficiente de gerenciar formulários em uma aplicação React. Aqui está um guia sobre como realizar essa integração.
 
-Setting up two separate SSH keys took me entirely too long because all of the information that I needed was spread out across multiple sources. I am going to consolidate them here for others to find, so hopefully this will save you some time! If you don’t know what an SSH key is or why it is used, you can check out this article to learn more about them.
+### 1. **Instalação das Dependências**
 
-My company uses a private Github account, and for my personal use, I have a public Github account. I am going to be travelling for the next month, so I wanted to be able to access my personal repos on my work laptop instead of hauling both around with me. Here are the steps that I took to set it up.
-
-For the sake of this article, personal = Github and work = Github, but obviously do what you need to do.
-
-# Step 1: Navigate to the right location
-
-All of your SSH keys need to be stored in `~/.ssh`, so navigate there using:
-
-`cd ~/.ssh`
-
-The ~ means the root of your user directory, which should make your SSH keys accessible no matter where you navigate to in your file structure, so long as you are logged into the correct user.
-
-# Step 2: Create the SSH keys
-
-Next you will need to generate the keys. Start by creating your personal key:
+Primeiro, instale as dependências necessárias:
 
 ```bash
-ssh-keygen -t rsa -C "name@personal_email.com"
+npm install react-hook-form zod @hookform/resolvers
 ```
 
-Hit enter.
+Aqui está o que cada biblioteca faz:
 
-It will prompt you for a file name, you should name it something like: `id_rsa_personal`
+- `react-hook-form`: Gerenciamento de formulários em React.
+- `zod`: Validação de esquemas com TypeScript.
+- `@hookform/resolvers`: Adapta a validação do Zod para ser utilizada no `react-hook-form`.
 
-This will print out a big chuck of text for your fingerprint. You can ignore that, we’ll grab what we need from the key after.
+### 2. **Criando o Esquema de Validação com Zod**
 
-Now create your work key:
+Vamos criar um esquema de validação com Zod para um formulário de login:
 
-```bash
-ssh-keygen -t rsa -C "name@work_email.com"
+```typescript
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z
+    .string({ required_error: 'required_email' })
+    .email({
+      message: 'email_invalid',
+    })
+    .trim(),
+  password: z
+    .string({ required_error: 'required_password' })
+    .min(6, {
+      message: 'password_too_short',
+    })
+    .trim(),
+});
+
+type LoginFormInputs = z.infer<typeof loginSchema>;
 ```
 
-Hit enter.
+Aqui, estamos definindo as mensagens de erro como chaves que serão traduzidas pelo i18n.
 
-This time, when it prompts you for a file name, use `id_rsa_work`
+### 3. **Configurando as Traduções no i18n**
 
-These each will create two files (so four in total), one with the name you entered, and a second with .pub at the end of it.
+Adicione as mensagens de erro ao seu arquivo de tradução, por exemplo, `src/i18n/en-US/form.json`:
 
-# Step 3: Create a config file
-
-Still in the same terminal, try using ls to see if a file name config exists. If it does, use `code config` to open it up in your code editor. If it doesn’t exist, you can create it by using `touch config`, then open it with `code config`. Copy and paste the following in your config:
-
-```bash
-# Personal Account: (Your-Github-Account-Name)
-
-Host github.com-(Your-Github-Account-Name)
-HostName github.com
-User git
-IdentityFile ~/.ssh/id_rsa_personal
-
-# Work Account: (Your-Github-Account-Name)
-
-Host github.com-(Your-Github-Account-Name)
-HostName github.com
-User git
-IdentityFile ~/.ssh/id_rsa_work
-
+```json
+{
+  "required_email": "E-mail is required",
+  "email_invalid": "Please enter a valid email address.",
+  "required_password": "password is required",
+  "password_too_short": "Password must be at least 6 characters long.",
+  "email": "Email",
+  "password": "Password",
+  "login": "Login"
+}
 ```
 
-# Step 4: Add the keys to the Agent
+Para português, no arquivo `src/i18n/pt-BR/form.json`:
 
-In a new admin elevated PowerShell window, ensure the ssh-agent is running. You can use the "Auto-launching the ssh-agent" instructions in "Working with SSH key passphrases", or start it manually:
-
-```bash
-# start the ssh-agent in the background
-Get-Service -Name ssh-agent | Set-Service -StartupType Manual
-Start-Service ssh-agent
+```json
+{
+  "required_email": "E-mail é obrigatório",
+  "email_invalid": "Por favor, insira um endereço de e-mail válido.",
+  "required_password": "Senha é obrigatória",
+  "password_too_short": "A senha deve ter pelo menos 6 caracteres.",
+  "email": "E-mail",
+  "password": "Senha",
+  "login": "Entrar"
+}
 ```
 
-First, let's check the list of keys already watched by the ssh-agent
+### 4. **Integração do `react-hook-form` com `Zod` e `i18n`**
 
-```bash
-ssh-add -l
+Agora, vamos integrar o `react-hook-form` com Zod e utilizar o i18n para exibir mensagens de erro traduzidas.
+
+```typescript
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
+import formMessages from "../../i18n/en-US/form.json";
+
+const loginSchema = z.object({
+  email: z.string({ required_error: 'required_email' }).email({
+    message: 'email_invalid',
+  }).trim(),
+  password: z.string({ required_error: 'required_password' }).min(6, {
+    message: 'password_too_short',
+  }).trim(),
+});
+
+type LoginFormInputs = z.infer<typeof loginSchema>;
+
+const LoginForm = () => {
+  const { t } = useTranslation('form');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = (data: LoginFormInputs) => {
+    console.log(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div>
+        <label>{t('email')}</label>
+        <input
+          type="email"
+          {...register('email')}
+        />
+        {errors.email && <span>{t(errors.email.message as keyof typeof formMessages)}</span>}
+      </div>
+
+      <div>
+        <label>{t('password')}</label>
+        <input
+          type="password"
+          {...register('password')}
+        />
+        {errors.password && <span>{t(errors.password.message as keyof typeof formMessages)}</span>}
+      </div>
+
+      <button type="submit">{t('login')}</button>
+    </form>
+  );
+};
+
+export default LoginForm;
 ```
 
-If your key isn't already watched, you need to add it to the list.
-In a terminal window without elevated permissions, add your SSH private key to the ssh-agent. If you created your key with a different name, or if you are adding an existing key that has a different name, replace id_rsa_personal in the command with the name of your private key file.
+Caso utilize o `form` do Shadcn/ui, é possível realizar a mesma configuração apenas alterando o arquivo `form.tsx` na pasta `src/components/ui/form.tsx`:
 
-```bash
-ssh-add c:/Users/YOU/.ssh/id_rsa_personal
+```typescript
+import errorMessages from '../../i18n/pt-BR/errorsMessageSchema.json';
+
+const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, children, ...props }, ref) => {
+    const { t } = useTranslation('errorsMessageSchema');
+    const { error, formMessageId } = useFormField();
+    const body = error ? String(error?.message) : children;
+
+    if (!body) {
+      return null;
+    }
+    return (
+      <p
+        key={String(error?.message)}
+        ref={ref}
+        id={formMessageId}
+        className={cn('text-[0.8rem] font-medium text-destructive', className)}
+        {...props}
+      >
+        {t(body as keyof typeof errorMessages)}
+      </p>
+    );
+  },
+);
+FormMessage.displayName = 'FormMessage';
 ```
 
-Then do it to the work key too
+A partir disso, todos compontentes de messagem do formulário obterão a função de tradução, só necessecitando que a chave seja indenficada no arquivo traduzido para a linguagem desejada:
 
-```bash
-ssh-add c:/Users/YOU/.ssh/id_rsa_work
+```json
+{
+  "post_title_required_error": "Como vc quer que o pessoal leia se nem titulo tu ta colocando??",
+  "post_title_min": "Como vc quer que o pessoal leia se nem titulo tu ta colocando??",
+  "post_description_required_error": "Como vc quer que o pessoal leia se nem titulo tu ta colocando??",
+  "post_description_min": "Como vc quer que o pessoal leia se nem titulo tu ta colocando??",
+  "post_body_required_error": "Como vc quer que o pessoal leia se nem titulo tu ta colocando??",
+  "post_body_min": "Como vc quer que o pessoal leia se nem titulo tu ta colocando??",
+  "login_username_required_error": "O campo é obrigatório amigão",
+  "login_username_min": "O campo não pode ser vazio amigão",
+  "login_password_required_error": "Preciso dele pra testar aqui na maquininha",
+  "login_password_min": "Tá faltando número nisso ai amigo",
+  "login_password_max": "Oloko amigo isso não é alemão não pra que tanta letra"
+}
 ```
 
-# Step 5: Add keys to your accounts
+### 5. **Explicação do Código**
 
-Next you will need to grab the actual key to add to either account. To do this, you can type the command:
+- **Schema de Validação (`loginSchema`)**: Define as regras de validação usando Zod, com as mensagens de erro configuradas como chaves de tradução.
+- **Hook `useForm` com `zodResolver`**: O `react-hook-form` é configurado para usar o `zodResolver`, que adapta o esquema de validação do Zod ao `react-hook-form`.
 
-```bash
-clip < ~/.ssh/id_rsa_personal.pub
-```
+- **Utilização de `useTranslation`**: O `useTranslation` do i18next é utilizado para traduzir as chaves de erro retornadas pelo Zod, exibindo as mensagens de erro localizadas.
 
-The key will be copied. You can then navigate to the SSH keys section of Github and paste your new key in!
-Repeat with `clip < ~/.ssh/id_rsa_work.pub` and you will be golden!
+- **Exibição de Erros**: As mensagens de erro são exibidas traduzidas, utilizando as chaves retornadas pelo Zod e traduzidas com `t()` do i18next. As mensagens de erro são identificadas pela chave ao importar o arquivo .json e informando o formato ao typescript com `keyof typeof formMessages`.
 
-Try to pull or clone a repo from either account and see if it works. You might have to reload your config file (from ~/.ssh type in source config), but if you do happen to get an error while trying, use the next step. If you don’t get an error, then you are done setup and can jump to step 6.
+### 6. **Conclusão**
 
-# Step 6: Clone your repo with the correct host
-
-In step 3, we created a field called Host for each of our SSH keys. In my example, I named them after the website used for source control. If you decided to name yours something else, make sure you reference it when you clone a new repo. In my case, I can clone the repository with the following command:
-
-```bash
-git clone git@github.com-(Your-Github-Account-Name):(Your-Github-Account-Name)/repo-name.git
-```
-
-Hopefully that helps!
+Com essa integração, você pode gerenciar formulários no React com validação tipada, robusta e mensagens de erro localizadas, melhorando a experiência do usuário em aplicações multilíngues. O uso do `react-hook-form` combinado com Zod e i18n fornece uma solução eficiente e escalável para a validação e internacionalização de formulários em React.
 
 ---

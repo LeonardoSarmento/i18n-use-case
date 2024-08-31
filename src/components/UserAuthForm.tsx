@@ -4,9 +4,7 @@ import { Button } from './ui/button';
 import { useForm } from 'react-hook-form';
 import { LoginSchema, LoginType } from '@services/types/Login';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@services/hooks/auth';
 import { getRandomNumberWithDecimals } from '@services/utils/utils';
-import { useRouter } from '@tanstack/react-router';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -14,8 +12,6 @@ import { useTranslation } from 'react-i18next';
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const auth = useAuth();
-  const router = useRouter();
   const { t } = useTranslation('login');
   const form = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
@@ -23,15 +19,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    if (values.username !== import.meta.env.VITE_USER_USERNAME && values.password !== import.meta.env.VITE_USER_CODE) {
-      toast.error(t('toastMessage.error.title'), {
-        description: t('toastMessage.error.description'),
+    if (values.username === 'admin' && values.password === 'admin') {
+      toast.success(t('toastMessage.success.title', { val: getRandomNumberWithDecimals() }), {
+        description: t('toastMessage.success.description', { username: values.username }),
       });
       return;
     }
-    auth.login(values, 'skajdksjakdj').then(() => router.invalidate());
-    toast.success(t('toastMessage.success.title', { val: getRandomNumberWithDecimals() }), {
-      description: t('toastMessage.success.description', { username: values.username }),
+    toast.error(t('toastMessage.error.title'), {
+      description: t('toastMessage.error.description'),
     });
   });
 

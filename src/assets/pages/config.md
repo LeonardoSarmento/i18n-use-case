@@ -49,7 +49,7 @@ import { initReactI18next } from 'react-i18next';
 import resources_pt_BR from './pt-BR';
 import resources_en_US from './en-US';
 
-export const defaultNS = 'contact';
+export const defaultNS = 'home';
 
 i18next
   .use(LanguageDetector)
@@ -71,6 +71,15 @@ i18next.loadLanguages(['pt-BR', 'en-US']);
 
 export default i18next;
 ```
+
+Assim informamos:
+
+- `SupportedLngs`: As linguagens suportadas no nosso projeto.
+- `FallbackLng`: Linguaguens devemos mostrar caso a liguagem do usuário detectada pelo `LanguageDetector` não esteja disponível.
+- `Load`: Quais estilos de código de lingua o `i18next` deve procurar.
+- `Resouces`: As traduções das linguagens que estamos disponibilizando.
+
+E por fim carregamos as linguagens que queremos utilizar na inicialização da aplicação.
 
 ### Adicionando arquivos de tradução
 
@@ -242,52 +251,107 @@ i18n.init({
 O fallback de idioma é utilizado quando a tradução para o idioma atual não está disponível. Já configuramos o `fallbackLng` para `['en-US', 'pt-BR']`, mas você pode personalizar isso ainda mais:
 
 ```typescript
-// fallback to one language
+// fallback para uma lingua
 i18next.init({
   fallbackLng: 'en',
 });
 
-// fallback ordered
+// fallback ordenado
 i18next.init({
-  fallbackLng: ['fr', 'en'],
+  fallbackLng: ['en-US', 'pt-BR'],
 });
 
-// fallback depending on user language
+// fallback dependendo da linguagem do usuário
 i18next.init({
   fallbackLng: {
-    'de-CH': ['fr', 'it'], //French and Italian are also spoken in Switzerland
+    'de-CH': ['fr', 'it'], //Françes e Italiano também são falados na Suiça
     'zh-Hant': ['zh-Hans', 'en'],
     es: ['fr'],
     default: ['en'],
   },
 });
-
-// function that returns an array of fallbacks
-// your function may also return a string or object as above
-i18next.init({
-  fallbackLng: (code) => {
-    if (!code || code === 'en') return ['en-US'];
-    const fallbacks = [code];
-
-    // We maintain en-US and en-AU. Some regions will prefer en-AU.
-    if (code.startsWith('en-') && !['en-US', 'en-AU'].includes(code)) {
-      if (['en-GB', 'en-NZ', 'en-IR'].includes(code)) fallbacks.push('en-AU');
-      else fallbacks.push('en-US');
-      return fallbacks;
-    }
-
-    // add pure lang
-    const langPart = code.split('-')[0];
-    if (langPart !== code) fallbacks.push(langPart);
-
-    // finally, developer language
-    fallbacks.push('dev');
-    return fallbacks;
-  },
-});
 ```
 
-### Suporte a Interpolação e Pluralização
+### Múltiplas chaves de fallback
+
+Chamando a função t com um array de chaves, permite você traduzir chaves dinamicamente sem prover um valor especifico como fallback.
+
+Como um exemplo, temos um caso onde deve mostrar uma mensagem de alerta de acordo com o código de erro recebido:
+
+```json
+{
+  "error": {
+    "unspecific": "Aconteceu algo de errado",
+    "404": "A página não foi encontrada"
+  }
+}
+```
+
+```typescript
+// const error = '404';
+i18next.t([`error.${error}`, 'error.unspecific']); // -> "A página não foi encontrada"
+
+// const error = '502';
+i18next.t([`error.${error}`, 'error.unspecific']); // -> "Aconteceu algo de errado"
+```
+
+---
+
+## Suporte a Objetos e Arrays
+
+### Objetos
+
+Você pode retornar objetos e arrays para serem utilizados em sua função no componente:
+
+```json
+{
+  "tree": {
+    "res": "adicionado {{algo}}"
+  },
+  "array": ["a", "b", "c"]
+}
+```
+
+```typescript
+i18next.t('tree', { returnObjects: true, something: 'comida' });
+// -> { res: 'adicionado comida' }
+
+i18next.t('array', { returnObjects: true });
+// -> ['a', 'b', 'c']
+```
+
+`returnObjects` pode ser configurado para `true` na inicialização da aplicação.
+
+### Arrays
+
+Você consegue acessar o valor de um array ou juntar eles:
+
+```json
+{
+  "arrayJoin": ["linha1", "linha2", "linha3"],
+  "arrayJoinWithInterpolation": ["você", "consegue", "{{myVar}}"],
+  "arrayOfObjects": [{ "name": "Leo" }, { "name": "Sarmento" }]
+}
+```
+
+```typescript
+i18next.t('arrayJoin', { joinArrays: '+' });
+// -> "linha1+linha2+linha3"
+
+i18next.t('arrayJoinWithInterpolation', { myVar: 'interpolar', joinArrays: ' ' });
+// -> "você consegue interpolar"
+
+i18next.t('arrayOfObjects.0.name');
+// -> "Leo"
+```
+
+O valor retornado possui suporte a interpolação, plural, aninhamento, ...
+
+`joinArrays` pode ser configurado para um valor na inicialização da aplicação.
+
+---
+
+## Suporte a Interpolação e Pluralização
 
 O `i18next` também oferece suporte a interpolação e pluralização, permitindo que você crie traduções mais dinâmicas:
 
@@ -327,11 +391,15 @@ function Description(){
 }
 ```
 
-### Suporte para Formatação
+---
+
+## Suporte para Formatação
 
 Também é possível se beneficiar das funcionalidade nativas de formatação do `i18next`:
 
-## Numbers
+### Numbers
+
+Formatando números e com diferentes casas decímais:
 
 ```json
 {
@@ -355,7 +423,9 @@ t('intlNumberWithOptions', { val: 2000, minimumFractionDigits: 3 });
 
 ---
 
-## Currency
+### Currency
+
+Utilizando formatação de diferentes moedas:
 
 `src/i18n/en-US/currency.json`
 
@@ -395,7 +465,9 @@ t('twoIntlCurrencyWithUniqueFormatOptions', {
 
 ---
 
-## DateTime
+### DateTime
+
+Formatação para datas:
 
 ```json
 {
@@ -417,7 +489,9 @@ t('intlDateTime', {
 
 ---
 
-## RelativeTime
+### RelativeTime
+
+Para tempo relativos:
 
 ```json
 {
@@ -440,7 +514,9 @@ t('intlRelativeTimeWithOptionsExplicit', { val: -3, style: 'long' });
 
 ---
 
-## List
+### List
+
+Como formatar para listas:
 
 ```json
 {
@@ -452,6 +528,8 @@ t('intlRelativeTimeWithOptionsExplicit', { val: -3, style: 'long' });
 t('intlList', { val: ['locize', 'i18next', 'awesomeness'] });
 // --> A list of locize, i18next, and awesomeness
 ```
+
+---
 
 ## Gerenciamento de Idiomas na Aplicação
 
@@ -516,7 +594,7 @@ const Flag = ({ countryCode, className }: FlagProps) => {
 
 ```
 
-## Testando a Implementação do i18n
+<!-- ## Testando a Implementação do i18n
 
 ### Testando componentes traduzidos
 
@@ -543,7 +621,7 @@ test('renders translated text', () => {
 
 ### Usando mocks para simular diferentes idiomas
 
-Você também pode configurar testes para simular diferentes idiomas, verificando se os textos estão sendo renderizados corretamente em cada um deles.
+Você também pode configurar testes para simular diferentes idiomas, verificando se os textos estão sendo renderizados corretamente em cada um deles. -->
 
 ## Melhores Práticas
 

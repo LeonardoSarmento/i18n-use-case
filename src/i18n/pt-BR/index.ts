@@ -5,6 +5,7 @@ import NavigationBar from './nav-bar.json';
 import zod from './zod.json';
 import home from './home.json';
 import footer from './footer.json';
+import pending from './pending.json';
 
 const resources_pt_BR = {
   login,
@@ -14,6 +15,7 @@ const resources_pt_BR = {
   zod,
   home,
   footer,
+  pending
 };
 
 export default resources_pt_BR;
