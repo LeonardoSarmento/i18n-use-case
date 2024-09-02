@@ -9,7 +9,7 @@ import { Button } from './ui/button';
 export function NavigationBar() {
   const { t } = useTranslation('NavigationBar');
   return (
-    <div className="flex w-full flex-wrap-reverse items-center gap-4 p-2 sm:my-2 md:flex-nowrap xl:gap-2 xl:space-x-7">
+    <div className="flex w-full flex-wrap-reverse items-center gap-4 py-2 sm:my-2 md:flex-nowrap xl:gap-2 xl:space-x-7">
       <div className="hidden w-full justify-center md:order-first md:flex xl:w-1/3 xl:justify-start">
         <GitHubLink />
       </div>

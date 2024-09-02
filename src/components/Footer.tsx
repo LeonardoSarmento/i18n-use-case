@@ -21,7 +21,7 @@ function SocialButton({ Icon, link, name }: { link: string; name: string; Icon: 
 export function Footer() {
   const { t } = useTranslation('footer');
   return (
-    <div className="min-w-screen my-4 flex flex-col gap-4 px-8 xl:px-16">
+    <div className="min-w-screen mt-4 flex flex-col gap-4">
       <Card className="flex items-center justify-around py-2">
         {SocialMediaItems.map((item) => (
           <SocialButton key={item.name} name={item.name} link={item.link} Icon={item.icon} />
