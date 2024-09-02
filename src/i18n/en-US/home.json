@@ -1,6 +1,6 @@
 {
   "title": "Hello, I am Leonardo Sarmento!",
-  "description1": "An initial setup of the application library/system for application internationalization, i18n.",
+  "description1": "An initial configuration of the project with the application's internationalization system, i18n.",
   "description2": "Usage examples with formatting and integration with the Zod validation library.",
   "footer": "I hope you have a great development!",
   "stack": {
